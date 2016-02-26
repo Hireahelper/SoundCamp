@@ -109,14 +109,14 @@ var disableSoundPlay = true;
 
 var audio = null;
 var re = /:soundcamp \w+/;
-var mre = /message_/;
 
-// tell the chat client to play the sound
 function tellPlaySound(sound) {
     var input = $('#message-input');
-    input.val(':soundcamp '+ sound).focus().change();
+   
+    input.focus().val(':soundcamp '+ sound).change();
 	
-	var e = $.Event("keydown");
+    // todo: i can't for the life of me get this to work.
+	/*var e = $.Event("keydown");
 	e.which = 13;
 	e.keyCode = 13;
 	e.shiftKey = false;
@@ -124,11 +124,9 @@ function tellPlaySound(sound) {
 	e.ctrlKey = false;
 	e.charCode = 0;	
 	e.metaKey = false;
-	e.type = "keydown";
-	
-	// todo: i can't for the life of me get this to work.
-	
-	input.trigger(e);
+	e.type = "keydown";	
+	input.trigger(e);    
+    input.keydown();*/
 }
 
 function addChatSoundHTML(node, sound) {
@@ -187,32 +185,23 @@ function processSoundCommand(msgBody, play) {
     var m = re.exec(msg);
     if (m != null) {
         var sound = msg.replace(':soundcamp ', '');
-        //msgBody.replaceWith(sound);
         addChatSoundHTML(msgBody, sound);
         if (play && !disableSoundPlay) {	
             playSound(sound);
 	}
+    // todo: perhaps scroll to bottom of chat div, if needed - sometimes needed when loading chat window for first time and we're loading a lot of soundcamp GIFs/etc.
 	// scroll to bottom of chat div
-//	setTimeout(function() {
+    //	setTimeout(function() {
 		//$('#chats .chat_display:visible').scrollTop($('#chats .chat_display:visible')[0].scrollHeight);
-//	}, 200);
+    //	}, 200);
     }
 }
 
 function receivedMessage(e) {
-    //var t = e.target;
-	//var t = e;
-    //if (t.tagName.toLowerCase() === 'tr' && mre.exec(t.id)) {
-        //var msgBody = $(t).find('div.body');
-		var msgBody = $(e).find('.message_body');
-        processSoundCommand(msgBody, true);
-    //}
-}
-
-function scanAllMessages() {
-    $('div.message_content').each(function() {
-        processSoundCommand($(this), false);
-    });
+    // todo: i think these are doubling up when enter key is pressed. not sure.
+    // todo: dont re-play sounds when switching chat rooms.
+    var msgBody = $(e).find('.message_body');
+    processSoundCommand(msgBody, true);
 }
 
 function initControls() {
@@ -285,7 +274,7 @@ function initControls() {
 
 
 $(function() {
-	// https://github.com/naugtur/insertionQuery
+	// from https://github.com/naugtur/insertionQuery
 	var anime_watch = function(selector, callback) {
 		var guid = selector.replace(/[^a-zA-Z0-9]+/g, "_") +"_"+ ((new Date()).getTime());
 
@@ -306,14 +295,11 @@ $(function() {
 		document.addEventListener("webkitAnimationStart", eventHandler, false);
 	};
 
-	function initListener() {
-		// todo: i think these are doubling up when enter key is pressed. not sure.
-		
+	function initListener() {	
 		// Watches the animation event and parses li if they are inserted
 		anime_watch("div.message_content", receivedMessage);
 	}
 
-	//scanAllMessages();
 	initControls();
 	initListener();
 	
@@ -324,8 +310,5 @@ $(function() {
 	// todo: dirty hack to stop playing sounds when first loading slack.
 	setTimeout(function() {
 		disableSoundPlay = false;
-	}, 5000);	
-	
-	// todo: dont re-play sounds when switching chat rooms.
-	
+	}, 5000);			
 });
