@@ -1,27 +1,29 @@
 {
   "manifest_version": 2,
-  "name": "SoundCamp-Awesomer",
-  "version": "1.5.1",
-  "homepage_url": "http://www.github.com/mikefranz/SoundCamp/",
-  "description": "Custom sounds for campfire. But even more awesome.",
+  "name": "SoundCamp-4Slack",
+  "version": "0.0.1",
+  "description": "Custom sounds for Slack. At last.",
   "icons": {
       "128": "images/sc_logo_128.png",
        "48": "images/sc_logo_48.png"
   },
-  "permissions": [
-    "notifications",
-    "tabs",
-    "*://*.campfirenow.com/room/*"
+  "permissions": [ 
+	"activeTab", 
+	"storage",
+	"notifications",
+	"tabs",
+    "https://*.slack.com/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.campfirenow.com/room/*"],
+	  "all_frames": true,
+      "matches": [ "https://*.slack.com/*" ],
+	  "run_at": "document_start",
       "css": ["soundcamp.css"],
-      "js": ["jquery-1.7.1.min.js", "sound.js"]
+      "js": ["jquery-1.7.1.min.js", "sound.js" ]
     }
   ],
   "web_accessible_resources": [
-    "sound.js",
     "images/kelly_clarkston.jpg",
     "images/goodmorning_startshine.jpg",
     "images/alrightStan.png",

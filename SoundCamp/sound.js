@@ -105,16 +105,30 @@ var sounds = {
 var soundKeys = Object.keys(sounds);
 var soundKeysLength = soundKeys.length;
 
+var disableSoundPlay = true;
+
 var audio = null;
 var re = /:soundcamp \w+/;
 var mre = /message_/;
 
+// tell the chat client to play the sound
 function tellPlaySound(sound) {
-    var input = $('#input')[0];
-    var copy = input.value;
-    input.value = ':soundcamp '+ sound;
-    $('#send').click();
-    input.value = copy;
+    var input = $('#message-input');
+    input.val(':soundcamp '+ sound).focus().change();
+	
+	var e = $.Event("keydown");
+	e.which = 13;
+	e.keyCode = 13;
+	e.shiftKey = false;
+	e.altKey = false;
+	e.ctrlKey = false;
+	e.charCode = 0;	
+	e.metaKey = false;
+	e.type = "keydown";
+	
+	// todo: i can't for the life of me get this to work.
+	
+	input.trigger(e);
 }
 
 function addChatSoundHTML(node, sound) {
@@ -145,15 +159,8 @@ function addChatSoundHTML(node, sound) {
     node.append(html);
 }
 
-function soundEnabled() {
-    var img = $('#toggle_sounds_link').find('img');
-    var state = $(img).attr('alt');
-    if (state == 'Sound-on')
-        return true;
-    return false;
-}
-
 function playSound(sound) {
+	console.log('playSound',sound);
     if (audio) {
         audio.pause();
         document.body.removeChild(audio);
@@ -182,32 +189,34 @@ function processSoundCommand(msgBody, play) {
         var sound = msg.replace(':soundcamp ', '');
         //msgBody.replaceWith(sound);
         addChatSoundHTML(msgBody, sound);
-        if (play && soundEnabled()) {	
+        if (play && !disableSoundPlay) {	
             playSound(sound);
 	}
 	// scroll to bottom of chat div
-	setTimeout(function() {
-		$('#chats .chat_display:visible').scrollTop($('#chats .chat_display:visible')[0].scrollHeight);
-	}, 200);
+//	setTimeout(function() {
+		//$('#chats .chat_display:visible').scrollTop($('#chats .chat_display:visible')[0].scrollHeight);
+//	}, 200);
     }
 }
 
 function receivedMessage(e) {
-    var t = e.target;
-    if (t.tagName.toLowerCase() === 'tr' && mre.exec(t.id)) {
-        var msgBody = $(t).find('div.body');
+    //var t = e.target;
+	//var t = e;
+    //if (t.tagName.toLowerCase() === 'tr' && mre.exec(t.id)) {
+        //var msgBody = $(t).find('div.body');
+		var msgBody = $(e).find('.message_body');
         processSoundCommand(msgBody, true);
-    }
+    //}
 }
 
 function scanAllMessages() {
-    $('div.body').each(function() {
+    $('div.message_content').each(function() {
         processSoundCommand($(this), false);
     });
 }
 
 function initControls() {
-    $('<div>').attr('id', 'soundCamp-wrapper').attr('class', 'sctooltip').appendTo('#chat_controls');
+    $('<div>').attr('id', 'soundCamp-wrapper').attr('class', 'sctooltip').appendTo('#messages-input-container');
     $('<div>').attr('id', 'soundcampContainer').attr('class', 'sctooltip-outer').appendTo('#soundCamp-wrapper');	
 	var soundCampIcon = $('<img>')
 						.attr('src', chrome.extension.getURL('images/music.png'))
@@ -274,10 +283,49 @@ function initControls() {
 	$('#soundcampContainer').css('margin-left', '-591px'); // TODO: auto-calculate based on width of the popup, etc. -- or turn into a modal or something.
 }
 
-function initListener() {
-    $('#chat').bind('DOMNodeInserted', receivedMessage);
-}
 
-scanAllMessages();
-initControls();
-initListener();
+$(function() {
+	// https://github.com/naugtur/insertionQuery
+	var anime_watch = function(selector, callback) {
+		var guid = selector.replace(/[^a-zA-Z0-9]+/g, "_") +"_"+ ((new Date()).getTime());
+
+		$("<style/>").html([
+			"@-webkit-keyframes {guid} { from { clip: rect(auto, auto, auto, auto); } to { clip: rect(auto, auto, auto, auto); } }",
+			"@keyframes {guid} { from { clip: rect(auto, auto, auto, auto); } to { clip: rect(auto, auto, auto, auto); } }",
+			"{selector} { animation-duration: 0.001s; animation-name: {guid}; -webkit-animation-duration: 0.001s; -webkit-animation-name: {guid}; }"
+		].join("\n").replace(/\{guid\}/g, guid).replace(/\{selector\}/g, selector)).appendTo("head");
+
+
+		var eventHandler = function(event) {
+			if (event.animationName === guid || event.WebkitAnimationName === guid) {
+				callback.call(event.target, event.target);
+			}
+		}
+
+		document.addEventListener("animationstart", eventHandler, false);
+		document.addEventListener("webkitAnimationStart", eventHandler, false);
+	};
+
+	function initListener() {
+		// todo: i think these are doubling up when enter key is pressed. not sure.
+		
+		// Watches the animation event and parses li if they are inserted
+		anime_watch("div.message_content", receivedMessage);
+	}
+
+	//scanAllMessages();
+	initControls();
+	initListener();
+	
+	//$('#message-input').on('keydown',function(e){
+		//console.info('keydown', e, this);
+	//});
+	
+	// todo: dirty hack to stop playing sounds when first loading slack.
+	setTimeout(function() {
+		disableSoundPlay = false;
+	}, 5000);	
+	
+	// todo: dont re-play sounds when switching chat rooms.
+	
+});

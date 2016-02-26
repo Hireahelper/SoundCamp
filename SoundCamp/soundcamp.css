@@ -4,6 +4,8 @@
 
 #soundcampTable td {
 	white-space: nowrap;
+	padding: 1px;
+	margin: 0;
 }
 
 #soundcampTable td.mini-icon-col {
@@ -17,6 +19,9 @@
     height: 16px;
     margin: 2px 5px;
     opacity: 0.95;
+	position: absolute;
+    top: 8px;
+    right: -10px;
 }
 
 #soundCamp-wrapper:hover {
