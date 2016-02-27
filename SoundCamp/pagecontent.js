@@ -1,5 +1,5 @@
 window.addEventListener('message', function(event) {
-	if (event.origin !== "https://hireahelper.slack.com")
+	if (event.origin !== window.location.origin)
 		return;
 	
 	if (event.data.code == "SCKeydown") {

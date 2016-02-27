@@ -116,7 +116,7 @@ function tellPlaySound(sound) {
    
     input.focus().val(':soundcamp '+ sound).change();
 	
-	window.postMessage({ code: "SCKeydown" keyCode: 13 }, "*");
+	window.postMessage({ code: "SCKeydown", keyCode: 13 }, "*");
 }
 
 function addChatSoundHTML(node, sound) {
