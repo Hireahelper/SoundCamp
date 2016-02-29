@@ -20,10 +20,13 @@
       "matches": [ "https://*.slack.com/*" ],
 	  "run_at": "document_start",
       "css": ["soundcamp.css"],
-      "js": ["jquery-1.7.1.min.js", "sound.js" ]
+      "js": ["jquery-1.7.1.min.js", "inject.js", "sound.js"]
     }
   ],
   "web_accessible_resources": [
+	"jquery-1.7.1.min.js",
+	"pagecontent.js",
+	
     "images/kelly_clarkston.jpg",
     "images/goodmorning_startshine.jpg",
     "images/alrightStan.png",

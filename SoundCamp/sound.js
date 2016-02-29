@@ -1,3 +1,4 @@
+
 // Sorted alphabetically by label (first element of array)
 var sounds = {
     // key : [ label, soundfile, image, text ]
@@ -115,18 +116,7 @@ function tellPlaySound(sound) {
    
     input.focus().val(':soundcamp '+ sound).change();
 	
-    // todo: i can't for the life of me get this to work.
-	/*var e = $.Event("keydown");
-	e.which = 13;
-	e.keyCode = 13;
-	e.shiftKey = false;
-	e.altKey = false;
-	e.ctrlKey = false;
-	e.charCode = 0;	
-	e.metaKey = false;
-	e.type = "keydown";	
-	input.trigger(e);    
-    input.keydown();*/
+	window.postMessage({ code: "SCKeydown", keyCode: 13 }, "*");
 }
 
 function addChatSoundHTML(node, sound) {
@@ -272,7 +262,6 @@ function initControls() {
 	$('#soundcampContainer').css('margin-left', '-591px'); // TODO: auto-calculate based on width of the popup, etc. -- or turn into a modal or something.
 }
 
-
 $(function() {
 	// from https://github.com/naugtur/insertionQuery
 	var anime_watch = function(selector, callback) {
@@ -312,3 +301,4 @@ $(function() {
 		disableSoundPlay = false;
 	}, 5000);			
 });
+
